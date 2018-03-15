@@ -66,6 +66,9 @@ template <typename T, int U, int TI, int TD> ap_axiu <sizeof(T)*8,U,TI,TD> push_
 
 template <typename T, int in_num, int in_size, int out_num, int out_size, int k_size> 
 void convcore(T input[in_num][in_size][in_size], T weights[k_size * k_size * out_num], T bias[out_num], T output[out_num][out_size][out_size]){
+
+	#pragma HLS DATAFLOW
+
 		int i,j,k,l;
 		int k_i,k_j;
 
@@ -75,12 +78,26 @@ void convcore(T input[in_num][in_size][in_size], T weights[k_size * k_size * out
 				for(int k=0; k<out_size; k++)
 					output[i][j][k] = 0;
 		//original output
+
+
+//#pragma HLS array_reshap cyclic factor = 25 variable = input, weight, output
 		for(i=0; i<out_num; i++){
+//			#pragma AP PIPELINE
+//			#pragma HLS UNROLL
 			for(j=0; j<out_size; j++){
 				for(k=0; k<out_size; k++){
 					for(l=0; l<in_num; l++){
+						#pragma AP PIPELINE
+						#pragma HLS PIPELINE REWIND
+//						#pragma HLS UNROLL factor = 25
+
 						for(k_i=0; k_i<k_size; k_i++){
+							//#pragma AP PIPELINE
+							//#pragma HLS PIPELNE rewind
+//							#pragma HLS UNROLL
 							for(k_j=0; k_j<k_size; k_j++){
+							//#pragma AP PIPELINE
+
 								output[i][j][k] += input[l][j+k_i][k+k_j]*weights[i*(k_size*k_size*in_num)+l*(k_size*k_size)+k_i*k_size+k_j];
 							}
 						}
