@@ -9,7 +9,7 @@
 #include <ap_axi_sdata.h>
 #include <math.h>
 
-#define IMAGESIZE 256
+#define IMAGESIZE 32
 #define KERNELSIZE 5
 #define OUTSIZE IMAGESIZE-KERNELSIZE
 
@@ -76,12 +76,12 @@ void convcore(T input[in_num][in_size][in_size], T weights[k_size * k_size * out
 					output[i][j][k] = 0;
 		//original output
 		for(i=0; i<out_num; i++){
-			for(j=0; j<in_size-k_size+1; j++){
-				for(k=0; k<in_size-k_size+1; k++){
+			for(j=0; j<out_size; j++){
+				for(k=0; k<out_size; k++){
 					for(l=0; l<in_num; l++){
 						for(k_i=0; k_i<k_size; k_i++){
 							for(k_j=0; k_j<k_size; k_j++){
-								output[i][j][k] = output[i][j][k] + input[l][j+k_i][k+k_j]*weights[i*(k_size*k_size*in_num)+l*(k_size*k_size)+k_i*k_size+k_j];
+								output[i][j][k] += input[l][j+k_i][k+k_j]*weights[i*(k_size*k_size*in_num)+l*(k_size*k_size)+k_i*k_size+k_j];
 							}
 						}
 						
@@ -128,7 +128,7 @@ void accel_conv(AXI_VAL inputstream[1024], AXI_VAL outputstream[1024]){
 
 	hls_convolution(input, output);
 
-
+/*
 	for(int i=0; i<OUTSIZE; i++)
 	{
 		for(int j=0; j<OUTSIZE; j++){
@@ -136,6 +136,16 @@ void accel_conv(AXI_VAL inputstream[1024], AXI_VAL outputstream[1024]){
 			outputstream[i*OUTSIZE+j] = push_stream<float,1,1,1>(output[0][i][j], i*j == (OUTSIZE-1)*(OUTSIZE-1));
 		}
 
+	}*/
+	int col=0;
+	int row=0;
+	for(int i=0; i<(OUTSIZE*OUTSIZE);i++){
+		col ++;
+		if(col == OUTSIZE){
+			col = 0;
+			row ++;
+		}
+		outputstream[i] = push_stream<float,1,1,1>(output[0][row][col], i == (OUTSIZE*OUTSIZE-1));
 	}
 	return;
 }
