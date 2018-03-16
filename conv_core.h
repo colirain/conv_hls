@@ -9,7 +9,7 @@
 #include <ap_axi_sdata.h>
 #include <math.h>
 
-#define IMAGESIZE 32
+#define IMAGESIZE 200
 #define KERNELSIZE 5
 #define OUTSIZE IMAGESIZE-KERNELSIZE
 
@@ -87,17 +87,17 @@ void convcore(T input[in_num][in_size][in_size], T weights[k_size * k_size * out
 			for(j=0; j<out_size; j++){
 				for(k=0; k<out_size; k++){
 					for(l=0; l<in_num; l++){
-						#pragma AP PIPELINE
+						#pragmas AP PIPELINE
 						#pragma HLS PIPELINE REWIND
 //						#pragma HLS UNROLL factor = 25
 
 						for(k_i=0; k_i<k_size; k_i++){
 							//#pragma AP PIPELINE
 							//#pragma HLS PIPELNE rewind
-//							#pragma HLS UNROLL
+							#pragma HLS UNROLL factor=2
 							for(k_j=0; k_j<k_size; k_j++){
 							//#pragma AP PIPELINE
-
+//#pragma HLS UNROLL
 								output[i][j][k] += input[l][j+k_i][k+k_j]*weights[i*(k_size*k_size*in_num)+l*(k_size*k_size)+k_i*k_size+k_j];
 							}
 						}

@@ -23,3 +23,5 @@ void hls_conv_accel(AXI_VAL INPUT_STREAM[INPUTSIZE], AXI_VAL OUTPUT_STREAM[OUTPU
 	accel_conv(INPUT_STREAM, OUTPUT_STREAM);
 	return;
 }
+
+
