@@ -87,7 +87,7 @@ void convcore(T input[in_num][in_size][in_size], T weights[k_size * k_size * out
 			for(j=0; j<out_size; j++){
 				for(k=0; k<out_size; k++){
 					for(l=0; l<in_num; l++){
-						#pragmas AP PIPELINE
+						#pragma AP PIPELINE
 						#pragma HLS PIPELINE REWIND
 //						#pragma HLS UNROLL factor = 25
 
